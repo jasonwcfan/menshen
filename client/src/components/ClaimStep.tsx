@@ -19,12 +19,9 @@ import {
   Flex,
   Spacer,
 } from '@chakra-ui/react'
-import {useLocation} from 'react-router-dom'
-import StepsComponent from './StepsComponent'
-import MintFormVerifyStep from './MintFormVerifyStep'
 
 
-export default function MintFormClaimStep({faceDescriptor}: {faceDescriptor: Float32Array}) {
+export default function ClaimStep({faceDescriptor}: {faceDescriptor: Float32Array}) {
 
     const [credential, setCredential] = useState<number[]>([])
 

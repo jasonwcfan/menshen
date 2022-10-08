@@ -21,12 +21,12 @@ import {
 } from '@chakra-ui/react'
 import {useLocation} from 'react-router-dom'
 import StepsComponent from './StepsComponent'
-import MintFormVerifyStep from './MintFormVerifyStep'
-import MintFormClaimStep from './MintFormClaimStep'
+import VerifyStep from './VerifyStep'
+import ClaimStep from './ClaimStep'
 import * as faceapi from 'face-api.js'
 
 
-export default function MintForm() {
+export default function AppContainer() {
   
 
   const [step, setStep] = useState(1)
@@ -52,8 +52,8 @@ export default function MintForm() {
             </VStack>
             <StepsComponent activeStep={step}/>
             <Container px={10} py={6} maxWidth="inherit" border="1px solid #E2E8F0">
-              {(step === 1) && <MintFormVerifyStep incrementStep={incrementStep} faceDescriptor={faceDescriptor} setFaceDescriptor={setFaceDescriptor}/>}
-              {(step === 2) && <MintFormClaimStep faceDescriptor={faceDescriptor} />}
+              {(step === 1) && <VerifyStep incrementStep={incrementStep} faceDescriptor={faceDescriptor} setFaceDescriptor={setFaceDescriptor}/>}
+              {(step === 2) && <ClaimStep faceDescriptor={faceDescriptor} />}
             </Container>
         </VStack>
     </Grid>

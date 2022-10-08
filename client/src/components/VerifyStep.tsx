@@ -32,7 +32,7 @@ import * as faceapi from 'face-api.js'
 
 import VerifyModal from './VerifyModal';
 
-export default function MintFormVerifyStep({incrementStep, faceDescriptor, setFaceDescriptor}: {incrementStep: any, faceDescriptor: any, setFaceDescriptor: any}) {
+export default function VerifyStep({incrementStep, faceDescriptor, setFaceDescriptor}: {incrementStep: any, faceDescriptor: any, setFaceDescriptor: any}) {
 
   const [verifyStep, setVerifyStep] = useState(0)
   const [uploaded, setUploaded] = useState(false)
