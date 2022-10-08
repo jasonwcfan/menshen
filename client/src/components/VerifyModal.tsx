@@ -19,10 +19,11 @@ import MintFormVerifyStep from './MintFormVerifyStep'
 import * as faceapi from 'face-api.js'
 
 
-export default function VerifyModal() {
-  
+export default function VerifyModal({onSubmitFaceDescriptor} : {onSubmitFaceDescriptor: Function}) {
+
   const [modelsLoaded, setModelsLoaded] = useState(false)
   const [captureVideo, setCaptureVideo] = useState(false)
+  const [faceDescriptor, setFaceDescriptor] = useState(new Float32Array)
   const [landmarks, setLandmarks] = useState(new Array<faceapi.Point>)
 
   const videoRef = React.useRef<HTMLVideoElement>(null)
@@ -43,7 +44,7 @@ export default function VerifyModal() {
 
       await faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL)
       await faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL)
-      // await faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL)
+      await faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL)
       // await faceapi.nets.faceExpressionNet.loadFromUri(MODEL_URL)
 
       setModelsLoaded(true)
@@ -81,13 +82,13 @@ export default function VerifyModal() {
 
         faceapi.matchDimensions(canvasRef.current, displaySize);
 
-        const detections = await faceapi.detectSingleFace(videoRef.current, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks()
+        const detections = await faceapi.detectSingleFace(videoRef.current, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceDescriptor()
 
         if (detections) {
           const resizedDetections = faceapi.resizeResults(detections, displaySize)
           canvasRef && canvasRef.current && canvasRef.current.getContext('2d')?.clearRect(0, 0, videoWidth, videoHeight)
           canvasRef && canvasRef.current && faceapi.draw.drawFaceLandmarks(canvasRef.current, resizedDetections as faceapi.draw.DrawFaceLandmarksInput)
-          setLandmarks(detections.landmarks.positions)
+          setFaceDescriptor(detections.descriptor)
         }
       }
     }, 100)
@@ -100,6 +101,7 @@ export default function VerifyModal() {
           // canvasRef.current?.getContext('2d')?.drawImage(videoRef.current, 0, 0);
           screenshotRef.current.src = canvasRef.current?.toDataURL('image/jpeg')
           // screenshotRef.current.append(img)
+          onSubmitFaceDescriptor(faceDescriptor)
         }
         let mediaStream: MediaStream = videoRef.current.srcObject as MediaStream
         mediaStream.getTracks()[0].stop();
