@@ -1,12 +1,6 @@
 import React, {useEffect, useState} from 'react'
 import {
-  ChakraProvider,
-  Accordion,
-  AccordionItem,
-  AccordionButton,
-  AccordionPanel,
-  AccordionIcon,
-  Input,
+  useDisclosure,
   Container,
   Heading,
   Box,
@@ -55,7 +49,7 @@ export default function MintForm() {
               <Spacer />
               <Spacer />
             <Text alignSelf="start" textAlign="left" fontSize="4xl" fontWeight="bold">Mint a Menshen Passport</Text>
-            <Text alignSelf="start" textAlign="left" fontSize="2xl">Triton Passport is an NFT that proves that you are a human without sharing any of your personal data.</Text>
+            <Text alignSelf="start" textAlign="left" fontSize="2xl">Menshen Passport is an NFT that proves that you are a human without sharing any of your personal data.</Text>
             </VStack>
             <StepsComponent activeStep={step}/>
             <Container px={10} py={6} maxWidth="inherit" border="1px solid #E2E8F0">
