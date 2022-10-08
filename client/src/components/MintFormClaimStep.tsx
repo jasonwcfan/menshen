@@ -24,15 +24,27 @@ import StepsComponent from './StepsComponent'
 import MintFormVerifyStep from './MintFormVerifyStep'
 
 
-export default function MintFormClaimStep({faceDescriptor}: {faceDescriptor: any}) {
+export default function MintFormClaimStep({faceDescriptor}: {faceDescriptor: Float32Array}) {
 
-    const [credential, setCredential] = useState(null)
+    const [credential, setCredential] = useState<number[]>([])
 
 
-    function generateCredential() {
-        console.log(faceDescriptor)
-        setCredential(faceDescriptor.length) 
-   }
+    function handleGenerateCredential() {
+        let cred = [0, 0, 0, 0]
+    
+        let p1 = faceDescriptor.slice(0, 32)
+        let p2 = faceDescriptor.slice(32, 64)
+        let p3 = faceDescriptor.slice(64, 96)
+        let p4 = faceDescriptor.slice(96)
+    
+        cred[0] = Math.round(p1.reduce((p, c) => p+c)/32 * 100)
+        cred[1] = Math.round(p2.reduce((p, c) => p+c)/32 * 100)
+        cred[2] = Math.round(p3.reduce((p, c) => p+c)/32 * 100)
+        cred[3] = Math.round(p4.reduce((p, c) => p+c)/32 * 100)
+    
+        setCredential(cred)
+    
+      }
 
     return(
         <>
@@ -40,9 +52,9 @@ export default function MintFormClaimStep({faceDescriptor}: {faceDescriptor: any
         <Text textAlign="left">You have successfuly proved your humanity. Claim your credential below.</Text>
         <Container>
         <Box>
-            <Button colorScheme='teal' onClick={generateCredential}>Claim credential</Button>
-            {credential !== null && 
-                <Text mt={4} textAlign="left">Your credential: {credential}</Text>
+            <Button colorScheme='teal' onClick={handleGenerateCredential}>Claim credential</Button>
+            {credential.length > 0 && 
+                <Text mt={4} textAlign="left">Your credential: {credential.toString()}</Text>
             }
             
         </Box>

@@ -32,7 +32,7 @@ import * as faceapi from 'face-api.js'
 
 import VerifyModal from './VerifyModal';
 
-export default function MintFormVerifyStep({incrementStep, faceDescriptor, setFaceDescriptor, generateCredential}: {incrementStep: any, faceDescriptor: any, setFaceDescriptor: any, generateCredential: any}) {
+export default function MintFormVerifyStep({incrementStep, faceDescriptor, setFaceDescriptor}: {incrementStep: any, faceDescriptor: any, setFaceDescriptor: any}) {
 
   const [verifyStep, setVerifyStep] = useState(0)
   const [uploaded, setUploaded] = useState(false)
@@ -66,7 +66,6 @@ export default function MintFormVerifyStep({incrementStep, faceDescriptor, setFa
           <ModalFooter>
             <Button colorScheme='teal' isDisabled={(faceDescriptor.length == 0)} onClick={() => {
               onClose()
-              generateCredential(faceDescriptor)
               incrementStep()
               }} mr={3}>
               Submit
