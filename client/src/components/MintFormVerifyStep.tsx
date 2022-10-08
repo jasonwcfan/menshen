@@ -37,7 +37,7 @@ export default function MintFormVerifyStep({incrementStep}: {incrementStep: any}
     const [uploaded, setUploaded] = useState(false)
     const { isOpen, onOpen, onClose } = useDisclosure()
 
-    const disclosureText = "Menshen does all data processing on-device, and does not send any requests with your data to a centralized server."
+    const disclosureText = "Menshen processes all data on-device, and does not send your data to a centralized server or any third parties."
 
     function renderStep() {
       return <Box>
@@ -53,7 +53,7 @@ export default function MintFormVerifyStep({incrementStep}: {incrementStep: any}
         <Container>
           {renderStep()}
         </Container>
-        <Modal isOpen={isOpen} onClose={onClose}>
+        <Modal isOpen={isOpen} onClose={onClose} size='full'>
           <ModalOverlay />
           <ModalContent>
             <ModalHeader>Modal Title</ModalHeader>
