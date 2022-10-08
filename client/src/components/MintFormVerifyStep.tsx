@@ -32,7 +32,7 @@ import * as faceapi from 'face-api.js'
 
 import VerifyModal from './VerifyModal';
 
-export default function MintFormVerifyStep({incrementStep, faceDescriptor, setFaceDescriptor}: {incrementStep: any, faceDescriptor: any, setFaceDescriptor: any}) {
+export default function MintFormVerifyStep({incrementStep, faceDescriptor, setFaceDescriptor, generateCredential}: {incrementStep: any, faceDescriptor: any, setFaceDescriptor: any, generateCredential: any}) {
 
   const [verifyStep, setVerifyStep] = useState(0)
   const [uploaded, setUploaded] = useState(false)
@@ -47,29 +47,6 @@ export default function MintFormVerifyStep({incrementStep, faceDescriptor, setFa
       <Text mt={4} textAlign="left" fontSize="sm" textColor={"grey"}><b>Your privacy is preserved. </b>{disclosureText}</Text>
     </Box>
   }
-
-  // function handleSubmitFaceDescriptor(faceDescriptor: Float32Array) {
-      //   // Sandbox
-      //   console.log(faceDescriptor)
-      //   if (descriptor1.length < 1) {
-      //     setDescriptor1(faceDescriptor)
-      //   } else {
-      //     // compare descriptors
-      //     console.log(faceapi.euclideanDistance(descriptor1, faceDescriptor))
-
-      //     // compare transformed descriptors
-      //     // let tDesc1 = descriptor1.reduce((p, c, i) => {
-      //     //   return Math.ceil(p * c)
-      //     // })
-
-      //     // let tDesc2 = faceDescriptor.map((p) => {
-      //     //   return Math.ceil(p * 10)
-      //     // })
-
-      //     // console.log(faceapi.euclideanDistance(tDesc1, tDesc2))
-
-      //   }
-      // }
 
   return(
     <>
@@ -89,6 +66,7 @@ export default function MintFormVerifyStep({incrementStep, faceDescriptor, setFa
           <ModalFooter>
             <Button colorScheme='teal' isDisabled={(faceDescriptor.length == 0)} onClick={() => {
               onClose()
+              generateCredential(faceDescriptor)
               incrementStep()
               }} mr={3}>
               Submit

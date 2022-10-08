@@ -42,7 +42,22 @@ export default function MintForm() {
     setStep(1)
   }
 
+  function handleGenerateCredential(faceDescriptor: Float32Array) {
+    let newDesc = [0, 0, 0, 0]
 
+    let p1 = faceDescriptor.slice(0, 32)
+    let p2 = faceDescriptor.slice(32, 64)
+    let p3 = faceDescriptor.slice(64, 96)
+    let p4 = faceDescriptor.slice(96)
+
+    newDesc[0] = Math.round(p1.reduce((p, c) => p+c)/32 * 100)
+    newDesc[1] = Math.round(p2.reduce((p, c) => p+c)/32 * 100)
+    newDesc[2] = Math.round(p3.reduce((p, c) => p+c)/32 * 100)
+    newDesc[3] = Math.round(p4.reduce((p, c) => p+c)/32 * 100)
+
+    console.log('biometric credential: ' + newDesc)
+
+  }
 
   return (
 
@@ -60,7 +75,7 @@ export default function MintForm() {
             </VStack>
             <StepsComponent activeStep={step}/>
             <Container px={10} py={6} maxWidth="inherit" border="1px solid #E2E8F0">
-                    {(step === 1) && <MintFormVerifyStep incrementStep={incrementStep} faceDescriptor={faceDescriptor} setFaceDescriptor={setFaceDescriptor} />}
+            {(step === 1) && <MintFormVerifyStep incrementStep={incrementStep} faceDescriptor={faceDescriptor} setFaceDescriptor={setFaceDescriptor} generateCredential={handleGenerateCredential}/>}
                     {(step === 2) && <MintFormClaimStep faceDescriptor={faceDescriptor} />}
 
             </Container>
