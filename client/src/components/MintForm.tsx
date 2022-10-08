@@ -1,6 +1,12 @@
 import React, {useEffect, useState} from 'react'
 import {
-  useDisclosure,
+  ChakraProvider,
+  Accordion,
+  AccordionItem,
+  AccordionButton,
+  AccordionPanel,
+  AccordionIcon,
+  Input,
   Container,
   Heading,
   Box,
@@ -16,14 +22,15 @@ import {
 import {useLocation} from 'react-router-dom'
 import StepsComponent from './StepsComponent'
 import MintFormVerifyStep from './MintFormVerifyStep'
+import MintFormClaimStep from './MintFormClaimStep'
+import * as faceapi from 'face-api.js'
 
 
 export default function MintForm() {
   
 
   const [step, setStep] = useState(1)
-  const [documents, setDocuments] = useState([])
-  const [managerAddress, setManagerAddress] = useState("")
+  const [faceDescriptor, setFaceDescriptor] = useState(new Float32Array)
 
   const location = useLocation()
   
@@ -48,13 +55,13 @@ export default function MintForm() {
               <Spacer />
               <Spacer />
               <Spacer />
-            <Text alignSelf="start" textAlign="left" fontSize="4xl" fontWeight="bold">Mint a Menshen Passport</Text>
-            <Text alignSelf="start" textAlign="left" fontSize="2xl">Menshen Passport is an NFT that proves that you are a human without sharing any of your personal data.</Text>
+            <Text alignSelf="start" textAlign="left" fontSize="4xl" fontWeight="bold">Get your Menshen Credential</Text>
+            <Text alignSelf="start" textAlign="left" fontSize="2xl">Menshen Credential is a zero-knowledge credential that proves that you are a human without storing any of your personal data.</Text>
             </VStack>
             <StepsComponent activeStep={step}/>
             <Container px={10} py={6} maxWidth="inherit" border="1px solid #E2E8F0">
-                    {(step === 1) && <MintFormVerifyStep incrementStep={incrementStep} />}
-                    {/* {(step === 2) && <MintFormContactStep resetStep={resetStep} />} */}
+                    {(step === 1) && <MintFormVerifyStep incrementStep={incrementStep} faceDescriptor={faceDescriptor} setFaceDescriptor={setFaceDescriptor} />}
+                    {(step === 2) && <MintFormClaimStep faceDescriptor={faceDescriptor} />}
 
             </Container>
         </VStack>
