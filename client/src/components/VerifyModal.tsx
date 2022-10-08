@@ -21,13 +21,15 @@ import * as faceapi from 'face-api.js'
 
 export default function VerifyModal() {
   
-  const [modelsLoaded, setModelsLoaded] = React.useState(false)
-  const [captureVideo, setCaptureVideo] = React.useState(false)
+  const [modelsLoaded, setModelsLoaded] = useState(false)
+  const [captureVideo, setCaptureVideo] = useState(false)
+  const [landmarks, setLandmarks] = useState(new Array<faceapi.Point>)
 
   const videoRef = React.useRef<HTMLVideoElement>(null)
   const videoHeight = 480
   const videoWidth = 640
   const canvasRef = React.useRef<HTMLCanvasElement>(null)
+  const screenshotRef = React.useRef<HTMLImageElement>(null)
 
   const [step, setStep] = useState(1)
   const [documents, setDocuments] = useState([])
@@ -51,6 +53,9 @@ export default function VerifyModal() {
 
   const startVideo = async () => {
     setCaptureVideo(true);
+    if (screenshotRef.current) {
+      screenshotRef.current.src = ''
+    }
     try {
       let stream: MediaStream = await navigator.mediaDevices.getUserMedia({ video: { width: 300 } })
       let video: HTMLVideoElement | null = videoRef.current
@@ -76,14 +81,14 @@ export default function VerifyModal() {
 
         faceapi.matchDimensions(canvasRef.current, displaySize);
 
-        const detections = await faceapi.detectAllFaces(videoRef.current, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks();
+        const detections = await faceapi.detectSingleFace(videoRef.current, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks()
 
-        const resizedDetections = faceapi.resizeResults(detections, displaySize);
-
-        canvasRef && canvasRef.current && canvasRef.current.getContext('2d')?.clearRect(0, 0, videoWidth, videoHeight);
-        canvasRef && canvasRef.current && faceapi.draw.drawDetections(canvasRef.current, resizedDetections);
-        canvasRef && canvasRef.current && faceapi.draw.drawFaceLandmarks(canvasRef.current, resizedDetections);
-        // canvasRef && canvasRef.current && faceapi.draw.drawFaceExpressions(canvasRef.current, resizedDetections);
+        if (detections) {
+          const resizedDetections = faceapi.resizeResults(detections, displaySize)
+          canvasRef && canvasRef.current && canvasRef.current.getContext('2d')?.clearRect(0, 0, videoWidth, videoHeight)
+          canvasRef && canvasRef.current && faceapi.draw.drawFaceLandmarks(canvasRef.current, resizedDetections as faceapi.draw.DrawFaceLandmarksInput)
+          setLandmarks(detections.landmarks.positions)
+        }
       }
     }, 100)
   }
@@ -91,6 +96,11 @@ export default function VerifyModal() {
     const closeWebcam = () => {
       if (videoRef.current) {
         videoRef.current.pause();
+        if (canvasRef.current && screenshotRef.current) {
+          // canvasRef.current?.getContext('2d')?.drawImage(videoRef.current, 0, 0);
+          screenshotRef.current.src = canvasRef.current?.toDataURL('image/jpeg')
+          // screenshotRef.current.append(img)
+        }
         let mediaStream: MediaStream = videoRef.current.srcObject as MediaStream
         mediaStream.getTracks()[0].stop();
       }
@@ -105,30 +115,24 @@ export default function VerifyModal() {
       <Box textAlign='center' p={10}>
         {
           captureVideo && modelsLoaded ?
-            <button onClick={closeWebcam} style={{ cursor: 'pointer', backgroundColor: 'green', color: 'white', padding: '15px', fontSize: '25px', border: 'none', borderRadius: '10px' }}>
+            <Button onClick={closeWebcam} style={{ cursor: 'pointer', backgroundColor: 'green', color: 'white', padding: '15px', fontSize: '25px', border: 'none', borderRadius: '10px' }}>
               Close Webcam
-            </button>
+            </Button>
             :
             <button onClick={startVideo} style={{ cursor: 'pointer', backgroundColor: 'green', color: 'white', padding: '15px', fontSize: '25px', border: 'none', borderRadius: '10px' }}>
               Open Webcam
             </button>
         }
       </Box>
-      {
-        captureVideo ?
-          modelsLoaded ?
-            <Box display='flex' justifyContent='center'>
-              <Box position='relative' width={videoWidth} height={videoHeight}>
-                <video ref={videoRef} height={videoHeight} width={videoWidth} onPlay={handleVideoOnPlay} style={{ borderRadius: '10px' }} />
-                <canvas ref={canvasRef} style={{ position: 'absolute' , top: 0, left: 0}} />
-              </Box>
-            </Box>
-            :
-            <div>loading...</div>
-          :
-          <>
-          </>
-      }
+      <Box display='flex' justifyContent='center'>
+          <Box position='relative' width={videoWidth} height={videoHeight}>
+            {captureVideo && modelsLoaded && <>
+              <video ref={videoRef} height={videoHeight} width={videoWidth} onPlay={handleVideoOnPlay} style={{ borderRadius: '10px' }} />
+              <canvas ref={canvasRef} style={{ position: 'absolute' , top: 0, left: 0}} />
+            </>}
+            <img ref={screenshotRef} style={{ position: 'absolute' , top: 0, left: 0, zIndex: 9999}}/>
+          </Box>
+        </Box>
     </Box>
   )
 }
