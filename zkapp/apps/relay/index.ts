@@ -4,6 +4,8 @@ import { Contract, providers, utils, Wallet } from "ethers"
 import express from "express"
 import { resolve } from "path"
 import { abi as contractAbi } from "../contracts/build/contracts/contracts/Greeter.sol/Greeter.json"
+import { Identity } from "@semaphore-protocol/identity"
+
 
 dotenvConfig({ path: resolve(__dirname, "../../.env") })
 
@@ -41,6 +43,9 @@ app.post("/greet", async (req, res) => {
     const { greeting, merkleRoot, nullifierHash, solidityProof } = req.body
 
     try {
+
+        // Instead of this we will call a mint function of an NFT smart contract from the client side.
+        // The NFT contract which will then call Greeter contract to verify the proof.
         const transaction = await contract.greet(
             utils.formatBytes32String(greeting),
             merkleRoot,
@@ -54,6 +59,8 @@ app.post("/greet", async (req, res) => {
     } catch (error: any) {
         console.error(error)
 
+        console.log('error')
+
         res.status(500).end()
     }
 })
@@ -61,12 +68,29 @@ app.post("/greet", async (req, res) => {
 app.post("/join-group", async (req, res) => {
     const { identityCommitment, username } = req.body
 
+    const facePoints = '[1, 2, 3, 4]'
+
+    const identity = new Identity(facePoints)
+
+    const commitment = identity.generateCommitment().toString()
+
+    const trapdoor = identity.getTrapdoor().toString()
+    const nullifier = identity.getNullifier().toString()
+
+    const result = {
+        trapdoor: trapdoor,
+        nullifier: nullifier
+    }
+
+
+
+
     try {
-        const transaction = await contract.joinGroup(identityCommitment, utils.formatBytes32String(username))
+        const transaction = await contract.joinGroup(commitment, utils.formatBytes32String('username'))
 
         await transaction.wait()
 
-        res.status(200).end()
+        res.status(200).json(result)
     } catch (error: any) {
         console.error(error)
 

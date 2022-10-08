@@ -58,7 +58,7 @@ export default function GroupStep({ signer, contract, identity, onPrevClick, onN
                 setLoading.on()
                 onLog(`Joining the Greeter group...`)
 
-                const { status } = await fetch(`${process.env.RELAY_URL}/join-group`, {
+                const result = await fetch(`${process.env.RELAY_URL}/join-group`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
@@ -67,7 +67,12 @@ export default function GroupStep({ signer, contract, identity, onPrevClick, onN
                     })
                 })
 
-                if (status === 200) {
+                console.log(result)
+
+                const resultJson = await result.json()
+                console.log(resultJson)
+
+                if (result.status === 200) {
                     setUsers((users: any) => [...users, { identityCommitment: _identityCommitment, username }])
 
                     onLog(`You joined the Greeter group event 🎉 Greet anonymously!`)
@@ -134,7 +139,7 @@ export default function GroupStep({ signer, contract, identity, onPrevClick, onN
                     colorScheme="primary"
                     px="4"
                     onClick={joinGroup}
-                    isDisabled={_loading || userHasJoined()}
+                    isDisabled={_loading}
                     leftIcon={<IconAddCircleFill />}
                 >
                     Join group
