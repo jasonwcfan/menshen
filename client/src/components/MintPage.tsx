@@ -14,6 +14,7 @@ import {
   ModalFooter,
   Box,
   Button,
+  Input,
   Text,
   Link,
   VStack,
@@ -25,15 +26,17 @@ import {
 } from '@chakra-ui/react'
 import {ethers} from 'ethers'
 import MenshenID from '../utils/MenshenID.json'
+import Greeter from '../utils/Greeter.json'
 
-const CONTRACT_ADDRESS_HARDHAT = "0x5FC8d32690cc91D4c39d9d3abcBD16989F875707"
+const MENSHEN_CONTRACT_ADDRESS_HARDHAT = "0x5FC8d32690cc91D4c39d9d3abcBD16989F875707"
+const GREETER_CONTRACT_ADDRESS_HARDHAT = "0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9"
 // const CONTRACT_ADDRESS_RINKEBY = ""
 
 export default function Mint() {
   const [isLoading, setIsLoading] = useState(false)
-  const [finishedMinting, setFinishedMinting] = useState(false)
+  const [credentials, setCredentials] = useState("")
   const [errorReason, setErrorReason] = useState("")
-  const [nftHash, setNftHash] = useState('')
+  const [nftHash, setNftHash] = useState("")
   const { isOpen, onOpen, onClose } = useDisclosure()
 
 
@@ -56,24 +59,30 @@ export default function Mint() {
       const { ethereum } = window;
 
       if (ethereum) {
-        const provider = new ethers.providers.Web3Provider(ethereum);
-        const signer = provider.getSigner();
-        const connectedContract = new ethers.Contract(CONTRACT_ADDRESS_HARDHAT, MenshenID.abi, signer);
-
-        let greeting = ''
-        let merkleTreeRoot = null
-        let nullifierHash = null
-        let proof = null
 
         setIsLoading(true)
-        let nftTxn = await connectedContract.mintNFT();
 
-        await nftTxn.wait();
+        const response = await fetch(`http://localhost:4000/greet`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                credentials
+            })
+        })
+
+        if (response.status === 200) {
+            console.log(`You were verified 🎉`)
+            console.log(response)
+            // setNftHash(response.body)
+            onOpen()
+        } else {
+            console.log(response)
+            console.error("You do not qualify to mint a Menshen ID")
+        }
+
         setIsLoading(false)
-        setNftHash(nftTxn.hash)
-        onOpen()
 
-      } else {
+      } else  {
         console.log("Ethereum object doesn't exist!");
       }
     } catch (error: any) {
@@ -97,6 +106,7 @@ export default function Mint() {
           <Spacer />
           <Spacer />
           <Spacer />
+          <Input placeholder="Paste your credentials here" value={credentials} onChange={(e) => setCredentials(e.target.value)}/>
           <Button m={6} colorScheme="teal" onClick={clickMint} isLoading={isLoading} width="50%">Mint MEID</Button>
           <Spacer />
           <Spacer />

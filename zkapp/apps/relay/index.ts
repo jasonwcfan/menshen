@@ -3,14 +3,21 @@ import { config as dotenvConfig } from "dotenv"
 import { Contract, providers, utils, Wallet } from "ethers"
 import express from "express"
 import { resolve } from "path"
-import { abi as contractAbi } from "../contracts/build/contracts/contracts/Greeter.sol/Greeter.json"
+import { abi as greeterContractAbi } from "../contracts/build/contracts/contracts/Greeter.sol/Greeter.json"
+import { abi as menshenContractAbi } from "../contracts/build/contracts/contracts/MenshenID.sol/MenshenID.json"
 import { Identity } from "@semaphore-protocol/identity"
+import { Group } from "@semaphore-protocol/group"
+import { generateProof, packToSolidityProof } from "@semaphore-protocol/proof"
 
 
 dotenvConfig({ path: resolve(__dirname, "../../.env") })
 
-if (typeof process.env.CONTRACT_ADDRESS !== "string") {
-    throw new Error("Please, define CONTRACT_ADDRESS in your .env file")
+if (typeof process.env.GREETER_CONTRACT_ADDRESS !== "string") {
+    throw new Error("Please, define GREETER_CONTRACT_ADDRESS in your .env file")
+}
+
+if (typeof process.env.MENSHEN_CONTRACT_ADDRESS !== "string") {
+    throw new Error("Please, define MENSHEN_CONTRACT_ADDRESS in your .env file")
 }
 
 if (typeof process.env.ETHEREUM_URL !== "string") {
@@ -27,7 +34,8 @@ if (typeof process.env.RELAY_URL !== "string") {
 
 const ethereumPrivateKey = process.env.ETHEREUM_PRIVATE_KEY
 const ethereumURL = process.env.ETHEREUM_URL
-const contractAddress = process.env.CONTRACT_ADDRESS
+const greeterContractAddress = process.env.GREETER_CONTRACT_ADDRESS
+const menshenContractAddress = process.env.MENSHEN_CONTRACT_ADDRESS
 const { port } = new URL(process.env.RELAY_URL)
 
 const app = express()
@@ -37,25 +45,37 @@ app.use(express.json())
 
 const provider = new providers.JsonRpcProvider(ethereumURL)
 const signer = new Wallet(ethereumPrivateKey, provider)
-const contract = new Contract(contractAddress, contractAbi, signer)
+const greeterContract = new Contract(greeterContractAddress, greeterContractAbi, signer)
+const menshenContract = new Contract(menshenContractAddress, menshenContractAbi, signer)
 
 app.post("/greet", async (req, res) => {
-    const { greeting, merkleRoot, nullifierHash, solidityProof } = req.body
+    const { credentials } = req.body
 
     try {
 
+        const identity = new Identity(credentials)
+        const groupId = await greeterContract.groupId()
+        const users = await greeterContract.queryFilter(greeterContract.filters.NewUser())
+        const group = new Group()
+        const greeting = 'mint'
+
+        group.addMembers(users.map((e) => e.args![0].toString()))
+
+        const { proof, publicSignals } = await generateProof(identity, group, groupId.toString(), greeting)
+        const solidityProof = packToSolidityProof(proof)
+
         // Instead of this we will call a mint function of an NFT smart contract from the client side.
         // The NFT contract which will then call Greeter contract to verify the proof.
-        const transaction = await contract.greet(
+        const transaction = await menshenContract.mintNFT(
             utils.formatBytes32String(greeting),
-            merkleRoot,
-            nullifierHash,
+            publicSignals.merkleRoot,
+            publicSignals.nullifierHash,
             solidityProof
         )
 
         await transaction.wait()
 
-        res.status(200).end()
+        res.send(transaction.hash).status(200).end()
     } catch (error: any) {
         console.error(error)
 
@@ -88,7 +108,7 @@ app.post("/join-group", async (req, res) => {
 
 
     try {
-        const transaction = await contract.joinGroup(commitment, utils.formatBytes32String('username'))
+        const transaction = await greeterContract.joinGroup(commitment, utils.formatBytes32String('username'))
 
         await transaction.wait()
 
