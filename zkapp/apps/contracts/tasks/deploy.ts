@@ -1,6 +1,6 @@
 import { task, types } from "hardhat/config"
 
-task("deploy", "Deploy a Greeter contract")
+task("deploy", "Deploy a MenshenZK contract")
     .addOptionalParam("semaphore", "Semaphore contract address", undefined, types.string)
     .addParam("group", "Group identifier", 42, types.int)
     .addOptionalParam("logs", "Print the logs", true, types.boolean)
@@ -24,22 +24,22 @@ task("deploy", "Deploy a Greeter contract")
         // Note that the signer deploying this contract is going to be the first address:
         // 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
 
-        const Greeter = await ethers.getContractFactory("Greeter")
+        const menshenZK = await ethers.getContractFactory("MenshenZK")
 
-        const menshenContract = await ethers.getContractFactory("MenshenID")
+        const menshenID = await ethers.getContractFactory("MenshenID")
 
-        const greeter = await Greeter.deploy(semaphoreAddress, groupId)
+        const menshenZKInstance = await menshenZK.deploy(semaphoreAddress, groupId)
 
-        const menshenInstance = await menshenContract.deploy(semaphoreAddress, groupId)
+        const menshenIDInstance = await menshenID.deploy(semaphoreAddress, groupId)
 
-        await greeter.deployed()
+        await menshenZKInstance.deployed()
 
-        await menshenInstance.deployed()
+        await menshenIDInstance.deployed()
 
         if (logs) {
-            console.info(`Greeter contract has been deployed to: ${greeter.address}`)
-            console.info(`MenshenID contract has been deployed to: ${menshenInstance.address}`)
+            console.info(`MenshenZK contract has been deployed to: ${menshenZKInstance.address}`)
+            console.info(`MenshenID contract has been deployed to: ${menshenIDInstance.address}`)
         }
 
-        return greeter
+        return menshenZKInstance
     })

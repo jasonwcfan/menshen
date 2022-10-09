@@ -4,7 +4,7 @@ pragma solidity ^0.8.4;
 import "@semaphore-protocol/contracts/interfaces/ISemaphore.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract Greeter is Ownable {
+contract MenshenZK is Ownable {
     event NewGreeting(bytes32 greeting);
     event NewUser(uint256 identityCommitment, bytes32 username);
 

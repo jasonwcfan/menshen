@@ -3,8 +3,8 @@ import { config as dotenvConfig } from "dotenv"
 import { Contract, providers, utils, Wallet } from "ethers"
 import express from "express"
 import { resolve } from "path"
-import { abi as greeterContractAbi } from "../contracts/build/contracts/contracts/Greeter.sol/Greeter.json"
-import { abi as menshenContractAbi } from "../contracts/build/contracts/contracts/MenshenID.sol/MenshenID.json"
+import { abi as menshenZKContractAbi } from "../contracts/build/contracts/contracts/MenshenZK.sol/MenshenZK.json"
+import { abi as menshenIDContractAbi } from "../contracts/build/contracts/contracts/MenshenID.sol/MenshenID.json"
 import { Identity } from "@semaphore-protocol/identity"
 import { Group } from "@semaphore-protocol/group"
 import { generateProof, packToSolidityProof } from "@semaphore-protocol/proof"
@@ -12,12 +12,12 @@ import { generateProof, packToSolidityProof } from "@semaphore-protocol/proof"
 
 dotenvConfig({ path: resolve(__dirname, "../../.env") })
 
-if (typeof process.env.GREETER_CONTRACT_ADDRESS !== "string") {
-    throw new Error("Please, define GREETER_CONTRACT_ADDRESS in your .env file")
+if (typeof process.env.MENSHENZK_CONTRACT_ADDRESS !== "string") {
+    throw new Error("Please, define MENSHENZK_CONTRACT_ADDRESS in your .env file")
 }
 
-if (typeof process.env.MENSHEN_CONTRACT_ADDRESS !== "string") {
-    throw new Error("Please, define MENSHEN_CONTRACT_ADDRESS in your .env file")
+if (typeof process.env.MENSHENID_CONTRACT_ADDRESS !== "string") {
+    throw new Error("Please, define MENSHENID_CONTRACT_ADDRESS in your .env file")
 }
 
 if (typeof process.env.ETHEREUM_URL !== "string") {
@@ -34,8 +34,8 @@ if (typeof process.env.RELAY_URL !== "string") {
 
 const ethereumPrivateKey = process.env.ETHEREUM_PRIVATE_KEY
 const ethereumURL = process.env.ETHEREUM_URL
-const greeterContractAddress = process.env.GREETER_CONTRACT_ADDRESS
-const menshenContractAddress = process.env.MENSHEN_CONTRACT_ADDRESS
+const menshenZKContractAddress = process.env.MENSHENZK_CONTRACT_ADDRESS
+const menshenIDContractAddress = process.env.MENSHENID_CONTRACT_ADDRESS
 const { port } = new URL(process.env.RELAY_URL)
 
 const app = express()
@@ -45,8 +45,8 @@ app.use(express.json())
 
 const provider = new providers.JsonRpcProvider(ethereumURL)
 const signer = new Wallet(ethereumPrivateKey, provider)
-const greeterContract = new Contract(greeterContractAddress, greeterContractAbi, signer)
-const menshenContract = new Contract(menshenContractAddress, menshenContractAbi, signer)
+const menshenZKContract = new Contract(menshenZKContractAddress, menshenZKContractAbi, signer)
+const menshenIDContract = new Contract(menshenIDContractAddress, menshenIDContractAbi, signer)
 
 function getCredential(faceDescriptor: Float32Array) {
     let cred = [0, 0, 0, 0]
@@ -73,8 +73,8 @@ app.post("/greet", async (req, res) => {
     try {
 
         const identity = new Identity(credential)
-        const groupId = await greeterContract.groupId()
-        const users = await greeterContract.queryFilter(greeterContract.filters.NewUser())
+        const groupId = await menshenZKContract.groupId()
+        const users = await menshenZKContract.queryFilter(menshenZKContract.filters.NewUser())
         const group = new Group()
         const greeting = 'mint'
         const snarkArtifacts = {
@@ -119,7 +119,7 @@ app.post("/join-group", async (req, res) => {
     }
 
     try {
-        const transaction = await greeterContract.joinGroup(commitment, utils.formatBytes32String('username'))
+        const transaction = await menshenZKContract.joinGroup(commitment, utils.formatBytes32String('username'))
 
         await transaction.wait()
 
