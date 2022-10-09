@@ -29,7 +29,7 @@ import MenshenID from '../utils/MenshenID.json'
 import { getPreEmitDiagnostics } from 'typescript'
 
 const MENSHENID_CONTRACT_ADDRESS_HARDHAT = "0x5FC8d32690cc91D4c39d9d3abcBD16989F875707"
-// const CONTRACT_ADDRESS_RINKEBY = ""
+const MENSHENID_CONTRACT_ADDRESS_GOERLI = "0x44299b77b2d87182cfdc917cb00f2c7ad8063dc0"
 
 export default function MintPage() {
   const [isLoading, setIsLoading] = useState(false)
@@ -60,7 +60,7 @@ export default function MintPage() {
       if (ethereum) {
         const provider = new ethers.providers.Web3Provider(ethereum);
         const signer = provider.getSigner();
-        const connectedContract = new ethers.Contract(MENSHENID_CONTRACT_ADDRESS_HARDHAT, MenshenID.abi, signer);
+        const connectedContract = new ethers.Contract(MENSHENID_CONTRACT_ADDRESS_GOERLI, MenshenID.abi, signer);
 
         setIsLoading(true)
 
@@ -146,7 +146,7 @@ export default function MintPage() {
       <ModalHeader>Congratulations</ModalHeader>
       <ModalCloseButton />
       <ModalBody>
-        {`You have successfuly minted a Menshen ID. See transaction: https://rinkeby.etherscan.io/tx/${nftHash}`}
+        {`You have successfuly minted a Menshen ID. See transaction: https://goerli.etherscan.io/tx/${nftHash}`}
       </ModalBody>
       <ModalFooter>
         <Button 
