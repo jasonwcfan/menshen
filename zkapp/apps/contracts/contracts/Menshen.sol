@@ -1,40 +1,36 @@
-// //SPDX-License-Identifier: MIT
-// pragma solidity ^0.8.4;
+//SPDX-License-Identifier: MIT
+pragma solidity ^0.8.4;
 
-// import "@semaphore-protocol/contracts/interfaces/ISemaphore.sol";
+import "@semaphore-protocol/contracts/interfaces/ISemaphore.sol";
+import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "@openzeppelin/contracts/utils/Counters.sol";
 
-// contract Greeter {
-//     event NewGreeting(bytes32 greeting);
-//     event NewUser(uint256 identityCommitment, bytes32 username);
+contract MenshenID is ERC721 {
+    using Counters for Counters.Counter;
+    Counters.Counter private _tokenIds;
+    ISemaphore public semaphore;
+    uint256 public groupId;
 
-//     ISemaphore public semaphore;
+    constructor(address semaphoreAddress, uint256 _groupId) ERC721("Menshen Sybil Proof ID", "SPID") public {
+        semaphore = ISemaphore(semaphoreAddress);
+        groupId = _groupId;
+    }
 
-//     uint256 public groupId;
-//     mapping(uint256 => bytes32) public users;
+    function mintNFT(
+        bytes32 greeting,
+        uint256 merkleTreeRoot,
+        uint256 nullifierHash,
+        uint256[8] calldata proof
+    ) public returns (uint256) {
 
-//     constructor(address semaphoreAddress, uint256 _groupId) {
-//         semaphore = ISemaphore(semaphoreAddress);
-//         groupId = _groupId;
+        semaphore.verifyProof(groupId, merkleTreeRoot, greeting, nullifierHash, groupId, proof);
 
-//         semaphore.createGroup(groupId, 20, 0, address(this));
-//     }
 
-//     function joinGroup(uint256 identityCommitment, bytes32 username) external {
-//         semaphore.addMember(groupId, identityCommitment);
+        _tokenIds.increment();
 
-//         users[identityCommitment] = username;
+        uint256 newItemId = _tokenIds.current();
+        _safeMint(msg.sender, newItemId);
 
-//         emit NewUser(identityCommitment, username);
-//     }
-
-//     function greet(
-//         bytes32 greeting,
-//         uint256 merkleTreeRoot,
-//         uint256 nullifierHash,
-//         uint256[8] calldata proof
-//     ) external {
-//         semaphore.verifyProof(groupId, merkleTreeRoot, greeting, nullifierHash, groupId, proof);
-
-//         emit NewGreeting(greeting);
-//     }
-// }
+        return newItemId;
+    }
+}

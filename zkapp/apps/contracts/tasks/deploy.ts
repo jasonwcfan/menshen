@@ -26,12 +26,19 @@ task("deploy", "Deploy a Greeter contract")
 
         const Greeter = await ethers.getContractFactory("Greeter")
 
+        const menshenContract = await ethers.getContractFactory("MenshenID")
+
         const greeter = await Greeter.deploy(semaphoreAddress, groupId)
+
+        const menshenInstance = await menshenContract.deploy(semaphoreAddress, groupId)
 
         await greeter.deployed()
 
+        await menshenInstance.deployed()
+
         if (logs) {
             console.info(`Greeter contract has been deployed to: ${greeter.address}`)
+            console.info(`MenshenID contract has been deployed to: ${menshenInstance.address}`)
         }
 
         return greeter
