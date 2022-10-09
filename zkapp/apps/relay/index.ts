@@ -70,7 +70,9 @@ app.post("/join-group", async (req, res) => {
 
     const facePoints = '[1, 2, 3, 4]'
 
-    const identity = new Identity(facePoints)
+    const credential = 'abcd' + facePoints
+
+    const identity = new Identity(credential)
 
     const commitment = identity.generateCommitment().toString()
 

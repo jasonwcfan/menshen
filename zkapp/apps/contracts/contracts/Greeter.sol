@@ -2,8 +2,9 @@
 pragma solidity ^0.8.4;
 
 import "@semaphore-protocol/contracts/interfaces/ISemaphore.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract Greeter {
+contract Greeter is Ownable {
     event NewGreeting(bytes32 greeting);
     event NewUser(uint256 identityCommitment, bytes32 username);
 
@@ -19,7 +20,7 @@ contract Greeter {
         semaphore.createGroup(groupId, 20, 0, address(this));
     }
 
-    function joinGroup(uint256 identityCommitment, bytes32 username) external {
+    function joinGroup(uint256 identityCommitment, bytes32 username) external onlyOwner {
         semaphore.addMember(groupId, identityCommitment);
 
         users[identityCommitment] = username;

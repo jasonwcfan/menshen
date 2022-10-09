@@ -20,6 +20,9 @@ task("deploy", "Deploy a Greeter contract")
 
             semaphoreAddress = address
         }
+        
+        // Note that the signer deploying this contract is going to be the first address:
+        // 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
 
         const Greeter = await ethers.getContractFactory("Greeter")
 
