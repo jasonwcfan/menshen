@@ -77,10 +77,14 @@ app.post("/greet", async (req, res) => {
         const users = await greeterContract.queryFilter(greeterContract.filters.NewUser())
         const group = new Group()
         const greeting = 'mint'
+        const snarkArtifacts = {
+            wasmFilePath: './snark-artifacts/semaphore.wasm',
+            zkeyFilePath: './snark-artifacts/semaphore.zkey'
+        }
 
         group.addMembers(users.map((e) => e.args![0].toString()))
 
-        const { proof, publicSignals } = await generateProof(identity, group, groupId.toString(), greeting)
+        const { proof, publicSignals } = await generateProof(identity, group, groupId.toString(), greeting, snarkArtifacts)
         const solidityProof = packToSolidityProof(proof)
 
         // Instead of this we will call a mint function of an NFT smart contract from the client side.
