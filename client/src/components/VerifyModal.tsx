@@ -76,12 +76,12 @@ export default function VerifyModal({setFaceDescriptor}: {setFaceDescriptor: any
 
         if (detections) {
           const resizedDetections = faceapi.resizeResults(detections, displaySize)
-          canvasRef && canvasRef.current && canvasRef.current.getContext('2d')?.clearRect(0, 0, videoWidth, videoHeight)
-          canvasRef && canvasRef.current && faceapi.draw.drawFaceLandmarks(canvasRef.current, resizedDetections as faceapi.draw.DrawFaceLandmarksInput)
+          // canvasRef && canvasRef.current && canvasRef.current.getContext('2d')?.clearRect(0, 0, videoWidth, videoHeight)
+          faceapi.draw.drawFaceLandmarks(canvasRef.current, resizedDetections as faceapi.draw.DrawFaceLandmarksInput)
           setFaceDescriptor(detections.descriptor)
         }
       }
-    }, 100)
+    }, 500)
   }
 
   const closeWebcam = () => {
@@ -103,7 +103,7 @@ export default function VerifyModal({setFaceDescriptor}: {setFaceDescriptor: any
   return (
     <Box textAlign="center" fontSize="xl">
       <Box textAlign='center' p={10}>
-      <Button onClick={captureVideo && modelsLoaded ? closeWebcam : startVideo} colorScheme='teal'>
+      <Button onClick={captureVideo && modelsLoaded ? closeWebcam : startVideo} colorScheme='teal' mb={6}>
         {captureVideo ? 'Stop Scan' : 'Start Scan'}
       </Button>
       <Box display='flex' justifyContent='center'>

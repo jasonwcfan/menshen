@@ -43,7 +43,7 @@ export default function VerifyStep({incrementStep, faceDescriptor, setFaceDescri
 
   function renderStep() {
     return <Box>
-      <Button colorScheme='teal' onClick={onOpen}>Verify</Button>
+      <Button colorScheme='teal' onClick={onOpen} m={4}>Verify</Button>
       <Text mt={4} textAlign="left" fontSize="sm" textColor={"grey"}><b>Your privacy is preserved. </b>{disclosureText}</Text>
     </Box>
   }
@@ -55,7 +55,7 @@ export default function VerifyStep({incrementStep, faceDescriptor, setFaceDescri
       <Container>
         {renderStep()}
       </Container>
-      <Modal isOpen={isOpen} onClose={onClose} size='full'>
+      <Modal isOpen={isOpen} onClose={onClose} size='xxl'>
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>Face Scan</ModalHeader>
