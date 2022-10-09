@@ -22,35 +22,55 @@ import {
 
 
 export default function ClaimStep({faceDescriptor}: {faceDescriptor: Float32Array}) {
+    const [credential, setCredential] = useState<String | null>(null)
+    const [isLoading, setIsLoading] = useState(false)
 
-    const [credential, setCredential] = useState<number[]>([])
+    function getFaceDescriptorNumbers(faceDescriptor: any) {
+        var result = []
 
+        for (const item of faceDescriptor) {
+            result.push(Number(item))
+        }
 
-    function handleGenerateCredential() {
-        let cred = [0, 0, 0, 0]
-    
-        let p1 = faceDescriptor.slice(0, 32)
-        let p2 = faceDescriptor.slice(32, 64)
-        let p3 = faceDescriptor.slice(64, 96)
-        let p4 = faceDescriptor.slice(96)
-    
-        cred[0] = Math.round(p1.reduce((p, c) => p+c)/32 * 100)
-        cred[1] = Math.round(p2.reduce((p, c) => p+c)/32 * 100)
-        cred[2] = Math.round(p3.reduce((p, c) => p+c)/32 * 100)
-        cred[3] = Math.round(p4.reduce((p, c) => p+c)/32 * 100)
-    
-        setCredential(cred)
-    
-      }
+        return result
+    }
+
+    async function generateCredential() {
+
+        setIsLoading(true)
+        setCredential(null)
+
+        const faceDescriptorNumbers = getFaceDescriptorNumbers(faceDescriptor)
+
+        const body = JSON.stringify({
+            faceDescriptor: faceDescriptorNumbers
+        })
+
+        try {
+            const result = await fetch(`http://localhost:4000/join-group`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: body
+            })
+
+            const resultJson = await result.json()
+
+            setCredential(JSON.stringify(resultJson))
+            setIsLoading(false)
+        } catch(e) {
+            console.log(e)
+            setIsLoading(false)
+        }    
+   }
 
     return(
         <>
         <Text fontSize="3xl" fontWeight="bold" textAlign="left">Claim Credential</Text>
-        <Text textAlign="left">You have successfuly proved your humanity. Claim your credential below.</Text>
+        <Text textAlign="left">You have successfully proved your humanity. Claim your credential below.</Text>
         <Container>
         <Box>
-            <Button colorScheme='teal' onClick={handleGenerateCredential}>Claim credential</Button>
-            {credential.length > 0 && 
+            <Button colorScheme='teal' isLoading={isLoading} onClick={generateCredential}>Claim credential</Button>
+            {credential !== null && 
                 <Text mt={4} textAlign="left">Your credential: {credential.toString()}</Text>
             }
             
