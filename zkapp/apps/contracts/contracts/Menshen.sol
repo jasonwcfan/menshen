@@ -11,7 +11,7 @@ contract MenshenID is ERC721 {
     ISemaphore public semaphore;
     uint256 public groupId;
 
-    constructor(address semaphoreAddress, uint256 _groupId) ERC721("Menshen Sybil Proof ID", "SPID") public {
+    constructor(address semaphoreAddress, uint256 _groupId) ERC721("Menshen Sybil Proof ID", "MEID") public {
         semaphore = ISemaphore(semaphoreAddress);
         groupId = _groupId;
     }

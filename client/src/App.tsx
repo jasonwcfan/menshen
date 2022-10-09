@@ -13,6 +13,7 @@ import { ColorModeSwitcher } from "./ColorModeSwitcher"
 import {ReactComponent as Logo} from "./logo.svg"
 import { Routes, Route, BrowserRouter} from 'react-router-dom'
 import AppContainer from './components/AppContainer'
+import MintPage from './components/MintPage'
 
 export const App = () => (
   <ChakraProvider theme={theme}>
@@ -23,6 +24,7 @@ export const App = () => (
     <BrowserRouter >
       <Routes>
         <Route path="/" element={<AppContainer />} />
+        <Route path="/mint" element={<MintPage />} />
       </Routes>
     </BrowserRouter>
   </ChakraProvider>
