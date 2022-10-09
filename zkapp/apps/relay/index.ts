@@ -87,21 +87,15 @@ app.post("/greet", async (req, res) => {
         const { proof, publicSignals } = await generateProof(identity, group, groupId.toString(), greeting, snarkArtifacts)
         const solidityProof = packToSolidityProof(proof)
 
-        // Instead of this we will call a mint function of an NFT smart contract from the client side.
-        // The NFT contract which will then call Greeter contract to verify the proof.
-        const transaction = await menshenContract.mintNFT(
-            utils.formatBytes32String(greeting),
-            publicSignals.merkleRoot,
-            publicSignals.nullifierHash,
+        res.send({
+            greeting,
+            merkleRoot: publicSignals.merkleRoot,
+            nullifierHash: publicSignals.nullifierHash,
             solidityProof
-        )
-
-        await transaction.wait()
-
-        res.send(transaction.hash).status(200).end()
+        }).status(200).end()
     } catch (error: any) {
         console.error(error)
-        res.status(500).end()
+        res.send(error).status(500).end()
     }
 })
 
